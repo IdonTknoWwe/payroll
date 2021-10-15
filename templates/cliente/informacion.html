@@ -1,0 +1,29 @@
+{% extends "templates/base/base.html" %}
+
+{% block titulo %}
+    Informacion
+{% endblock titulo %}
+
+{% block tagmenu %}
+    <li >
+        <a class="has-arrow " href="#" aria-expanded="false"><i class="mdi mdi-bullseye"></i><span class="hide-menu">Nomina</span></a>
+        <ul aria-expanded="false" class="collapse">
+            <li><a href="{% url 'Clientes:nominaEmpleado' pk=id %}">Crear</a></li>
+            <li><a href="{% url 'Clientes:statusNomina' pk=id %}">Listar</a></li>
+            <li><a href="{% url 'Clientes:revisadaNomina' pk=id %}">Revision</a></li>
+        </ul>
+    </li>
+    <li hidden=""></li>
+{% endblock tagmenu %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h1>Informacion</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

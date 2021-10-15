@@ -1,0 +1,33 @@
+<li>
+  <a class="has-arrow " href="#" aria-expanded="false"><i class="mdi mdi-bullseye"></i><span class="hide-menu">Cliente</span></a>
+  <ul aria-expanded="false" class="collapse">
+    <li><a href="{% url 'Clientes:crearCliente' %}">Agregar</a></li>
+    <li><a href="{% url 'Clientes:nuevoCliente' %}">Agregar por Excel</a></li>
+    <li><a href="{% url 'Clientes:listarCliente' %}">Listar</a></li>
+  </ul>
+</li>
+<li>
+  <a class="has-arrow " href="#" aria-expanded="false"><i class="mdi mdi-bullseye"></i><span class="hide-menu">Empresa</span></a>
+  <ul aria-expanded="false" class="collapse">
+    <li><a href="{% url 'Empresas:crearEmpresa' %}">Agregar</a></li>
+    <li><a href="{% url 'Empresas:nuevaEmpresa' %}">Agregar por Excel</a></li>
+    <li><a href="{% url 'Empresas:listarEmpresa' %}">Listar</a></li>
+  </ul>
+</li>
+<li>
+  <a class="has-arrow " href="#" aria-expanded="false"><i class="mdi mdi-bullseye"></i><span class="hide-menu">Empleado</span></a>
+  <ul aria-expanded="false" class="collapse">
+    <li><a href="{% url 'Empleados:crearEmpleado' %}">Agregar</a></li>
+    <li><a href="{% url 'Empleados:crearEmpleados' %}">Agregar por Excel</a></li>
+    <li><a href="{% url 'Empleados:listarEmpleado' %}">Listar</a></li>
+  </ul>
+</li>
+<li>
+  <a class="has-arrow " href="#" aria-expanded="false"><i class="mdi mdi-bullseye"></i><span class="hide-menu">Esquemas</span></a>
+  <ul aria-expanded="false" class="collapse">
+    <li><a href="{% url 'Administracion:crearEsquema' %}">Agregar</a></li>
+    <li><a href="{% url 'Administracion:listarEsquema' %}">Listar</a></li>
+  </ul>
+</li>
+
+<li hidden=""></li>

@@ -1,0 +1,78 @@
+{% extends "templates/base/base.html" %}
+
+{% block titulo %}
+	Esquemas de Pago
+{% endblock titulo %}
+
+{% block content %}
+	{% if object_list %}
+	<div class="row">
+		<div class="col-12">
+			<div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Esquemas de Pago</h4>
+          <table id="myTable"  class="table color-bordered-table info-bordered-table tablesaw table-bordered table-hover table" data-tablesaw-mode="swipe" data-tablesaw-sortable  data-tablesaw-minimap >
+            <thead>
+              <tr>
+              <th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="persist"><small>Identificador</small></th>
+              <th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Porcentaje Nomina</small></th>
+              <th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Monto Efectivo </small></th>
+             <th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Monto Asimilados </small></th>
+             <th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Monto Terceros </small></th>
+             <th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Monto Easy Vale</small></th>
+             <th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Monto Familiares</small></th>
+             <th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Tolerancia Monto</small></th>
+             <th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Tolerancia Porcentaje</small></th>
+             <th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Calculo por</small></th>
+             <th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Acciones </small></th>
+              </tr>
+            </thead>
+            <tbody>
+            	{% for scheme in object_list  %}
+            		<tr>
+            			<td>{{scheme.identifier}}</td>
+      						<td>{{scheme.playSheet}}%</td>
+									<td>{{scheme.cash}}</td>
+									<td>{{scheme.assimilated}}</td>
+									<td>{{scheme.pantryVouchers}}</td>
+									<td>{{scheme.thirds}}</td>
+									<td>{{scheme.family}}</td>
+									<td>{{scheme.quantity}}</td>
+									<td>{{scheme.percent}}%</td>
+									<td>
+										{% if scheme.action == 0 %}
+											CANTIDAD
+										{% else %}
+											PORCENTAJE
+										{% endif %}
+									</td>
+									<td>
+										<a href="{% url 'Administracion:editarEsquema' scheme.id %}" class="btn btn-info"><i class="fa fa-pencil"></i>  Editar</a>
+									</td>
+            		</tr>
+            	{% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+		</div>
+	</div>
+	{% else %}
+		<div class="row">
+			<div class="col-12">
+				<div class="card">
+					<div class="card-body">
+						<div class="alert alert-danger">
+							<h1 align="center">NO HAY ESQUEMAS DE PAGO</h1>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+{% endblock content %}
+
+{% block javascript %}
+	<script>
+	</script>	
+{% endblock javascript %}

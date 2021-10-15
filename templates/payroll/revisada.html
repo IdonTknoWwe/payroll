@@ -1,0 +1,100 @@
+{% extends "templates/base/base.html" %}
+
+
+{% block titulo %}
+	Revision de la nomina
+{% endblock titulo %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Revision de la Nomina</h4>
+         <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <select class="custom-select col-4" id="select">
+                <option value="-1">Selecciona una nomina</option>
+                {% for nomina in nominas %}
+                 <option value="{{nomina.id}}">{{nomina.creacion}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+           <div class="col-12">
+             <div class="tab-pane active" id="nomina"></div>
+           </div>
+           <div class="col-12">
+             <div class="tab-pane active" id="efectivo"></div>
+           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+{% block tabla %}
+{% endblock tabla %}
+
+{% block javascript %}
+  <script>
+    $("#select").on('change', inicio);
+    function inicio(){
+      var id = $(this).val();
+      if (id==-1){
+        $('#nomina').empty();
+        $('#efectivo').empty();
+      }else{
+      $.ajax({
+        url: '/client/detail/', 
+          type: 'GET', 
+          data: {id: id},  
+          success: function(resultado){
+          tablaNomina ='<div class="row"><div class="col-12"><div class="card"><div class="card-body"><h4 class="card-title">Empleados por Nomina</h4><table id="tablaNomina" class="table color-bordered-table info-bordered-table tablesaw table-bordered table-hover table info-bordered-table" data-tablesaw-mode="swipe"><thead><tr><th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="persist">Rfc</th><th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="4">Apellido Paterno</th><th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Apellido Materno</th><th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Nombre</th><th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Isr</th><th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Imss</th><th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Nomina Pagar</th></tr></thead><tbody>';
+
+          for (var i = 0; i < resultado['nomina'].length; i++) {
+            tablaNomina +='<tr>';
+            tablaNomina +='<td><small>'+resultado['nomina'][i]['rfc']+'</small></td>';
+            tablaNomina +='<td><small>'+resultado['nomina'][i]['apPaterno']+'</small></td>';
+            tablaNomina +='<td><small>'+resultado['nomina'][i]['apMaterno']+'</small></td>';
+            tablaNomina +='<td><small>'+resultado['nomina'][i]['nombre']+'</small></td>';
+            tablaNomina +='<td><small>'+resultado['nomina'][i]['isr']+'</small></td>';
+            tablaNomina +='<td><small>'+resultado['nomina'][i]['imss']+'</small></td>';
+            tablaNomina +='<td><small>'+resultado['nomina'][i]['nominaPagar']+'</small></td>';
+            tablaNomina +='</tr>'
+          }
+          tablaNomina +='</tbody></table></div></div></div></div>';
+          $('#nomina').html(tablaNomina);
+          $("#tablaNomina").table("refresh");
+
+          tablaEfectivo ='<div class="row"><div class="col-12"><div class="card"><div class="card-body"><h4 class="card-title">Empleados por Efectivo</h4><table id="tablaEfectivo" class="table color-bordered-table info-bordered-table tablesaw table-bordered table-hover table info-bordered-table" data-tablesaw-mode="swipe"><thead><tr><th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="persist">Rfc</th><th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="4">Apellido Paterno</th><th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Apellido Materno</th><th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Nombre</th><th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="4">Efectivo</th></tr></thead><tbody>';
+
+          for (var i = 0; i < resultado['efectivo'].length; i++) {
+            tablaEfectivo +='<tr>';
+            tablaEfectivo +='<td><small>'+resultado['efectivo'][i]['rfc']+'</small></td>';
+            tablaEfectivo +='<td><small>'+resultado['efectivo'][i]['apPaterno']+'</small></td>';
+            tablaEfectivo +='<td><small>'+resultado['efectivo'][i]['apMaterno']+'</small></td>';
+            tablaEfectivo +='<td><small>'+resultado['efectivo'][i]['nombre']+'</small></td>';
+            tablaEfectivo +='<td><small>'+resultado['efectivo'][i]['efectivo']+'</small></td>';
+            tablaEfectivo +='</tr>'
+          }
+          tablaEfectivo +='</tbody></table></div></div></div></div>';
+          $('#efectivo').html(tablaEfectivo);
+          $("#tablaEfectivo").table("refresh");
+          },
+          error: function(resultado){ 
+            console.log('error');
+          }
+      });
+    }
+  }
+    function efectivo(){
+      // alert('actualiza')
+    }
+  </script>
+{% endblock javascript %}

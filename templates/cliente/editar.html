@@ -1,0 +1,138 @@
+{% extends "templates/base/base.html" %}
+
+{% block titulo %}
+	Modificacion de Cliente
+{% endblock titulo %}
+
+{% block content %}
+	{% load widget_tweaks %}
+	<div class="row">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-body">
+		            <form method="POST" action="">
+		            	{% csrf_token %}
+		                <div class="form-body">
+		                    <h3 class="card-title">Modificacion de Cliente</h3>
+		                    <hr>
+		                    <div class="row p-t-20">
+		                        <div class="col-md-6">
+		                            <div class="form-group">
+		                                <label class="control-label">Nombre o razon social</label>
+		                                {% render_field form.name type="text" class+="form-control" %}
+		                            </div>
+		                        </div>
+		                        <div class="col-md-6">
+		                            <div class="form-group has-danger">
+		                                <label class="control-label">Comission</label>
+		                                {% render_field form.commission type="number" class+="form-control" %}
+		                            </div>
+		                        </div>
+		                        <div class="col-md-6">
+		                            <div class="form-group has-danger">
+		                                <label class="control-label">Prioridad</label>
+		                                {% render_field form.statusClient  class+="form-control" %}
+		                            </div>
+		                        </div>
+		                        <div class="col-md-6">
+		                            <div class="form-group has-danger">
+		                                <label class="control-label">Rfc</label>
+		                                {% render_field form.rfc type="text" class+="form-control" %}
+		                            </div>
+		                        </div>
+		                        <div class="col-md-6">
+		                            <div class="form-group has-danger">
+		                                <label class="control-label">Prima Acordada</label>
+		                                {% render_field form.primssAgreed type="number" class+="form-control" %}
+		                            </div>
+		                        </div>
+		                        <div class="col-md-6">
+		                            <div class="form-group has-danger">
+		                                <label class="control-label">Domicilio</label>
+		                                {% render_field form.domicilie type="text" class+="form-control" %}
+		                            </div>
+		                        </div>
+		                        <div class="col-md-6">
+		                            <div class="form-group has-danger">
+		                                <label class="control-label">Numero de Acta</label>
+		                                {% render_field form.numeroActa type="number" class+="form-control" %}
+		                            </div>
+		                        </div>
+		                        <div class="col-md-6">
+		                            <div class="form-group has-danger">
+		                                <label class="control-label">Representante Legal</label>
+		                                {% render_field form.legalRepresentative type="text" class+="form-control" %}
+		                            </div>
+		                        </div>
+		                        <div class="col-md-6">
+		                            <div class="form-group has-danger">
+		                                <label class="control-label">Fecha Constitucion</label>
+		                            	{% render_field form.dateConstitution type="text" class+="form-control" %}
+		                            </div>
+		                        </div>
+		                        <div class="col-md-6">
+		                            <div class="form-group has-danger">
+		                                <label class="control-label">Numero de Notario</label>
+		                            	{% render_field form.noNotario type="number" class+="form-control" %}
+		                            </div>
+		                        </div>
+		                        <div class="col-md-6">
+		                            <div class="form-group has-danger">
+		                                <label class="control-label">Residencia Acta</label>
+		                            	{% render_field form.residenciaActa type="text" class+="form-control" %}
+		                            </div>
+		                        </div>
+		                        <div class="col-md-6">
+		                            <div class="form-group has-danger">
+		                                <label class="control-label">Numero de Registro Publico Acta</label>
+		                            	{% render_field form.noRppActa type="number" class+="form-control" %}
+		                            </div>
+		                        </div>
+		                        <div class="col-md-6">
+		                            <div class="form-group has-danger">
+		                                <label class="control-label">Numero Poder</label>
+		                            	{% render_field form.numeroPoder type="text" class+="form-control" %}
+		                            </div>
+		                        </div>
+		                        <div class="col-md-6">
+		                            <div class="form-group has-danger">
+		                                <label class="control-label">Fecha Poder</label>
+		                            	{% render_field form.datePower type="text" class+="form-control" %}
+		                            </div>
+		                        </div>
+		                        <div class="col-md-6">
+		                            <div class="form-group has-danger">
+		                                <label class="control-label">Numero de Notario Poder</label>
+		                            	{% render_field form.noNotarioPoder type="number" class+="form-control" %}
+		                            </div>
+		                        </div>
+		                        <div class="col-md-6">
+		                            <div class="form-group has-danger">
+		                                <label class="control-label">Residencia Poder</label>
+		                            	{% render_field form.residenciaPoder type="text" class+="form-control" %}
+		                            </div>
+		                        </div>
+		                        <div class="col-md-6">
+		                            <div class="form-group has-danger">
+		                                <label class="control-label">Nombre de Notario Poder</label>
+		                            	{% render_field form.nameNotarioPoder type="text" class+="form-control" %}
+		                            </div>
+		                        </div>
+		                        <div class="col-md-6">
+		                            <div class="form-group has-danger">
+		                                <label class="control-label">Numero de Registro Poder</label>
+		                            	{% render_field form.noRppPoder type="text" class+="form-control" %}
+		                            </div>
+		                        </div>
+		                    </div>
+		                </div>
+		                <div class="form-actions">
+		                    <button type="submit" class="btn btn-success"> <i class="fa fa-floppy-o"></i> Guardar</button>
+		                    <a href="{% url 'Dashboard' %}" class="btn btn-danger"><i class="fa fa-window-close"></i> Cancelar</a>
+		                </div>
+	                </form>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock content %}

@@ -1,0 +1,274 @@
+{% extends "templates/base/base.html" %}
+
+{% block titulo %}
+	Mofificacion de Empleado
+{% endblock titulo %}
+
+{% block content %}
+	{% load widget_tweaks %}
+	<div class="row">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-body">
+          <form method="POST" action="">
+          	{% csrf_token %}
+            <div class="form-body">
+              <h3 class="card-title">Modificacion de Empleado</h3>
+              <hr>
+	            <div class="row p-t-20">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Clave Noi</label>
+                    {% render_field form.keyNoi type="number" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Apellido Paterno</label>
+                    {% render_field form.apPaterno type="text" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Apellido Materno</label>
+                    {% render_field form.apMaterno type="text" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Nombre(s)</label>
+                    {% render_field form.name type="text" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Nombre Banco</label>
+                    {% render_field form.bankName type="text" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Cuenta Bancaria</label>
+                    {% render_field form.countName type="number" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Clabe Bancaria</label>
+                    {% render_field form.interbankKey type="number" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Fecha de Ingreso</label>
+                    {% render_field form.dateAntiquity type="text" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Sueldo Mensual</label>
+                    {% render_field form.realMonthlySalary type="number" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Fecha Ingreso Imss</label>
+                    {% render_field form.lastDateImss type="text" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Sueldo Registrado</label>
+                    {% render_field form.registeredSalary type="number" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Sueldo Real</label>
+                    {% render_field form.realSalary type="number" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Credito Infonavit</label>
+                    {% render_field form.creditInfonavit type="number" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Credito Fonacot</label>
+                    {% render_field form.creditFonacot type="number" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Gratificacion</label>
+                    {% render_field form.gratification type="number" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Descuento</label>
+                    {% render_field form.discounts type="number" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Remanente</label>
+                    {% render_field form.remainder type="number" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Pension Alimenticia</label>
+                    {% render_field form.alimony type="number" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Sexo</label>
+                    {% render_field form.gender type="text" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Rfc</label>
+                    {% render_field form.rfc type="text" class+="form-control" %}
+                    {{form.rfc.errors}}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Curp</label>
+                    {% render_field form.curp type="text" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Domicilio</label>
+                    {% render_field form.domicilie type="text" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Puesto Contratado</label>
+                    {% render_field form.workstation type="text" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Dias Trabajados</label>
+                    {% render_field form.workday type="number" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Horario</label>
+                    {% render_field form.timetable type="text" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Dias de Descanso</label>
+                    {% render_field form.restday type="text" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Tipo de Calculo</label>
+                    {% render_field form.calculation type="text" class+="form-control" %}
+                  </div>
+                </div>
+               <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Distribucion </label>
+                    {% render_field form.distribute type="text" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Esquema de Pago </label>
+                    {% render_field form.scheme type="text" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Cliente</label>
+                    {% render_field form.cliente type="text" class+="form-control" %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="control-label">Tipo Nomina</label>
+                    {% render_field form.payroll type="text" class+="form-control" %}
+                  </div>
+                </div>
+		            <h3 class="card-title">Empresas que le pagan al empleado</h3>
+		            <hr>
+		            <div class="row p-t-20">
+		            	{% for i in form2 %}
+		              	<div class="col-md-6">
+		              		<div class="form-group">
+		                    <label class="control-label">Tipo de Empresa</label>
+		                    {% if forloop.counter == 1 %}
+				    							{% render_field i.typePayment name="typePayment1" type="text" class+="form-control" %}
+				    						{% endif %}
+								    		{% if forloop.counter == 2 %}
+								    			{% render_field i.typePayment name="typePayment2" type="text" class+="form-control" %}
+								    		{% endif %}
+							    			{% if forloop.counter == 3 %}
+							    				{% render_field i.typePayment name="typePayment3" type="text" class+="form-control" %}
+				    						{% endif %}
+								    		{% if forloop.counter == 4 %}
+								    			{% render_field i.typePayment name="typePayment4" type="text" class+="form-control" %}
+								    		{% endif %}
+								    		{% if forloop.counter == 5 %}
+								    			{% render_field i.typePayment name="typePayment5" type="text" class+="form-control" %}
+								    		{% endif %}
+								    		{% if forloop.counter == 6 %}
+								    			{% render_field i.typePayment name="typePayment6" type="text" class+="form-control" %}
+								    		{% endif %}
+		                  </div>
+		              	</div>	
+			            	<div class="col-md-6">
+			            		<div class="form-group">
+			                  <label class="control-label">Tipo de Empresa</label>
+			                  {% if forloop.counter == 1 %}
+								    			{% render_field i.enterprise name="enterprise1" type="text" class+="form-control" %}
+								    		{% endif %}
+												{% if forloop.counter == 2 %}
+									    		{% render_field i.enterprise name="enterprise2" type="text" class+="form-control" %}
+									    	{% endif %}
+												{% if forloop.counter == 3 %}
+									    		{% render_field i.enterprise name="enterprise3" type="text" class+="form-control" %}
+									    	{% endif %}
+												{% if forloop.counter == 4 %}
+									    		{% render_field i.enterprise name="enterprise4" type="text" class+="form-control" %}
+									    	{% endif %}
+												{% if forloop.counter == 5 %}
+									    		{% render_field i.enterprise name="enterprise5" type="text" class+="form-control" %}
+									    	{% endif %}
+												{% if forloop.counter == 6 %}
+									    		{% render_field i.enterprise name="enterprise6" type="text" class+="form-control" %}
+									    	{% endif %}
+			              	</div>
+			            	</div>	
+		            	{% endfor %}	
+		      			</div>
+		            <br>
+		            <div class="form-actions">
+		                <button type="submit" class="btn btn-success"><i class="fa fa-pencil"></i> Guardar</button>
+		                <a href="{% url 'Dashboard' %}" class="btn btn-danger"><i class="fa fa-window-close"></i> Cancelar</a>
+	            </div>
+            </div>
+          </form>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock content %}
+	
+{% block javascript %}
+	<script>
+	</script>
+{% endblock javascript %}

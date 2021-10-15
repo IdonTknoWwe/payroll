@@ -1,0 +1,135 @@
+{% extends "templates/base/base.html" %}
+
+{% block titulo %}
+	Estado Nomina
+{% endblock titulo %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-body">
+          <div class="form-body">
+            <h3 class="card-title">Nomina</h3>
+            <hr>
+            <div class="row p-t-20">
+              <div class="col-md-4">
+                <div class="form-group">
+                <label class="control-label">Nominas Realizadas</label>
+                  <select class="custom-select col-3" id="select">
+										<option value="-1">Elige una nomina</option>	
+										{% for nomina in nominas  %}
+											<option value="{{nomina.id}}">{{nomina.creacion}}</option>	
+										{% endfor %}
+									</select>
+                </div>
+              </div>
+              <div class="col-md-2" id="status">
+              </div>
+              <div class="col-md-2" id="inicio">
+              </div>
+              <div class="col-md-2" id="final">
+              </div>
+              <div class="col-md-2" id="pago">
+              </div>
+            </div>
+            <div class="row p-t-20">
+            	<div class="col-md-12">
+            		<div id="tabla"></div>
+            	</div>
+            </div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Detalles Nomina</h5>
+        </div>
+        <div class="modal-body" id="datos">
+        
+        </div>
+        <div class="modal-footer">
+        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block tabla %}
+{% endblock tabla %}
+
+{% block javascript %}
+	<script>
+	$("#select").on('change', inicio);
+		function inicio(){
+			var id = $(this).val();
+			if (id == -1){
+				$('#tabla').empty();
+				$('#status').empty();
+        $('#inicio').empty();
+        $('#final').empty();
+        $('#pago').empty();
+			}else{
+			$.ajax({
+				url: '/client/queryPayroll/', 
+          type: 'GET', 
+          data: {id: id},  
+          success: function(resultado){
+           tabla = '<table id="myTable"  class="table color-bordered-table info-bordered-table tablesaw table-bordered table-hover table" data-tablesaw-mode="swipe" data-tablesaw-sortable data-tablesaw-mode="stack" data-tablesaw-minimap ><thead><tr><th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="persist"><small>Rfc</small></th><th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Apellido Paterno</small></th><th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Apellido Materno</small></th><th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="2"><small>Nombre(s)</small></th><th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="2"><small>Sueldo Mensual</small></th><th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="2"><small>Calculo</small></th><th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="2"><small>Detalles</small></th></tr></thead><tbody>';
+
+          for (var i = resultado['nomina'].length - 1; i >= 0; i--) {
+          	tabla += '<tr>';
+            tabla += '<td><small>'+resultado['nomina'][i]['rfc']+'</small></td>';
+            tabla += '<td><small>'+resultado['nomina'][i]['apPaterno']+'</small></td>';
+            tabla += '<td><small>'+resultado['nomina'][i]['apMaterno']+'</small></td>';
+            tabla += '<td><small>'+resultado['nomina'][i]['nombre']+'</small></td>';
+            tabla += '<td><small>'+resultado['nomina'][i]['sueldoMensual']+'</small></td>';
+            tabla += '<td><small>'+resultado['nomina'][i]['calculo']+'</small></td>';
+            tabla += '<td><button class="btn btn-success" onclick="consulta('+resultado['nomina'][i]['id']+')">Detalles</button></td>'
+            tabla += '</tr>';
+          }
+          tabla +='</tbody></table>';
+
+          $('#tabla').html(tabla);
+          $('#status').html('<div class="form-group"><label class="control-label">Status Nomina</label><input type="text" class="form-control" disabled value="'+resultado['status']+'"></div>')
+          $('#inicio').html('<div class="form-group"><label class="control-label">Inicio Nomina</label><input type="text" class="form-control" disabled value="'+resultado['inicio']+'"></div>')
+          $('#final').html('<div class="form-group"><label class="control-label">Final Nomina</label><input type="text" class="form-control" disabled value="'+resultado['inicio']+'"></div>')
+          $('#pago').html('<div class="form-group"><label class="control-label">Pago Nomina</label><input type="text" class="form-control" disabled value="'+resultado['inicio']+'"></div>')
+          $("#myTable").table("refresh");
+
+          },
+          error: function(resultado){ 
+          	console.log('error');
+          }
+			});
+		}
+	}
+	function consulta(id){
+		$.ajax({
+			url: '/client/queryPayrollEmployee/', 
+			type:'GET',
+			data: {id: id},  
+      success: function(resultado){
+      	for (var i = 0; i < resultado['detail'].length; i++) {
+	      		valor ='<div class="row"><div class="col col-md-2"><label><small>APELLIDO PATERNO:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['apPaterno']+'></div><div class="col col-md-3"><label><small>APELLIDO MATERNO:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['apMaterno']+'></div><div class="col col-md-3"><label><small>NOMBRE(S):</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['nombre']+'></div><div class="col col-md-3"><label><small>RFC:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['rfc']+'></div></div><br><div class="row"><div class="col col-md-2"><label><small>CALCULO:</small></label><input class="form-control" type="" name=""  disabled value = '+resultado['detail'][i]['calculo']+'></div><div class="col col-md-2"><label><small>SUELDO MENSUAL:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['sueldoMensual']+'></div><div class="col col-md-2"><label><small>SUELDO IMSS:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['sueldoImss']+'></div><div class="col col-md-2"><label><small>ISR:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['isr']+'></div><div class="col col-md-2"><label><small>IMSS:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['imss']+'></div><div class="col col-md-2"><label><small>GRATICACION:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['gratificacion']+'></div></div><br><div class="row"><div class="col col-md-2"><label><small>DESCUENTO:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['descuento']+'></div><div class="col col-md-2"><label><small>CTO INFONAVIT:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['infonavit']+'></div><div class="col col-md-2"><label><small>CTO FONACOT:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['fonacot']+'></div><div class="col col-md-2"><label><small>P. ALIMENTICIA:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['pension']+'></div><div class="col col-md-2"><label><small>OTROS DTOS:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['otros']+'></div><div class="col col-md-2"><label><small>SUELDO NOMINA:</small></label><input class="form-control" type="" name=""disabled value = '+resultado['detail'][i]['sueldoNomina']+'></div></div><br><div class="row"><div class="col col-md-2"><label><small>BOLSA REPARTIR:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['sueldoBolsa']+'></div><div class="col col-md-2"><label><small>EFECTIVO:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['efectivo']+'></div><div class="col col-md-2"><label><small>B. ASIMILADO:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['brutoAsimilado']+'></div><div class="col col-md-2"><label><small>ISR ASIMILADO:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['isrAsimilado']+'></div><div class="col col-md-2"><label><small>NETO ASIMILADO:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['netoAsimilado']+'></div><div class="col col-md-2"><label><small>VALES:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['vales']+'></div></div><br><div class="row"><div class="col col-md-2"><label><small>TERCEROS:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['terceros']+'></div><div class="col col-md-2"><label><small>FAMILIARES:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['familiares']+'></div><div class="col col-md-2"><label><small>SOBRANTE:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['sobrante']+'></div><div class="col col-md-2"><label><small>NETO RECIBIDO:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['netoRecibido']+'></div><div class="col col-md-2"><label><small>DIAS NOMINA:</small></label><input class="form-control" type="" name="" disabled value = '+resultado['detail'][i]['diasNomina']+'></div></div>';
+
+	      		}
+	      	$("#datos").empty(); 
+	      	$('#datos').html(valor);
+	      	$('#myModal').modal('show')
+      },
+      error: function(resultado){ 
+      console.log('error');
+      }
+		});
+	}
+	</script>
+	
+{% endblock javascript %}

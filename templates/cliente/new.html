@@ -1,0 +1,175 @@
+{% extends "templates/base/base.html" %}
+
+{% block titulo %}
+  Crear Cliente
+{% endblock titulo %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+          <div class="card-body">
+              <form method="POST" action="" enctype="multipart/form-data" id="js-upload-form">
+                  {% csrf_token %}
+                <div class="form-body">
+                  <h3 class="card-title">Alta de Cliente</h3>
+                  <hr>
+                  <div class="row p-t-20">
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <input type="file" name="files" id="myFile" accept=".xls, .xlsx" /> 
+                      </div>
+                    </div>
+                    <div class="col-md-2">
+                      <div class="form-group">
+                        <button type="submit" class="btn btn-success"><i class="fa fa-spinner"></i> Cargar</button>
+                      </div>
+                    </div>
+                    <div class="col-md-2">
+                      <div class="form-group" id="boton">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row" >
+                    <div class="col-12" id="tabla">
+                    </div>
+                  </div>
+                </div>
+            </form>
+          </div>
+        </div>
+    </div>
+  </div>
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">ALERTA</h5>
+        </div>
+        <div class="modal-body">
+          <p><small><h3 id="mensaje"></h3></small></p>
+        </div>
+        <div class="modal-footer" id="btnEnviar">
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block tabla%}
+{% endblock tabla%}
+
+{% block javascript %}
+  <script>
+    function getCookie(name) { 
+      var cookieValue = null; 
+      if (document.cookie && document.cookie !== '') { 
+          var cookies = document.cookie.split(';'); 
+          for (var i = 0; i < cookies.length; i++) { 
+              var cookie = jQuery.trim(cookies[i]); 
+              if (cookie.substring(0, name.length + 1) === (name + '=')) { 
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1)); 
+                break; 
+              } 
+          } 
+      } 
+      return cookieValue; 
+    }
+    var csrftoken = getCookie('csrftoken'); 
+    function csrfSafeMethod(method){ 
+      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method)); 
+    } 
+    $.ajaxSetup({ 
+      beforeSend: function(xhr, settings) { 
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) { 
+          xhr.setRequestHeader("X-CSRFToken", csrftoken); 
+        } 
+      } 
+    });
+    
+
+    var tablaCliente = null;
+    document.getElementById('js-upload-form').addEventListener('submit', function(e) { 
+      e.preventDefault(); 
+      var filexlsx = document.getElementById('myFile').files[0]; 
+      var reader = new FileReader(); 
+      reader.onload = function(e){ 
+        var data = e.target.result; 
+        var workbook = XLSX.read(data, {type: 'binary'}); 
+        var result = {}; 
+        workbook.SheetNames.forEach(function(sheetName) { 
+          var roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]); 
+          if(roa.length > 0){ 
+            result[sheetName] = roa; 
+          } 
+        });
+        var clientes = JSON.stringify(result);
+        $.ajax({ 
+          url:'/client/new/', 
+          type: 'POST', 
+          dataType: 'json', 
+          data: {xls: clientes},  
+          success: function(resultado){
+            tablaCliente = resultado['detail']
+            var tabla;
+            tabla ='<table id="myTable"  class="table color-bordered-table info-bordered-table tablesaw table-bordered table-hover table" data-tablesaw-mode="swipe" data-tablesaw-sortable data-tablesaw-mode="stack" data-tablesaw-minimap ><thead><tr><th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="persist"><small>Razon Social</small></th><th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Rfc</small></th><th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Comision</small></th><th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="2"><small>Prioridad</small></th><th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="2"><small>Prima Acordada</small></th><th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>F. Const</small></th><th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Fecha Poder</small></th></tr></thead><tbody>';
+            for (var i = 0; i < resultado['detail'].length; i++) {
+                  tabla += '<tr>';
+                  tabla += '<td><small>'+resultado['detail'][i]['name']+'</small></td>';
+                  tabla += '<td><small>'+resultado['detail'][i]['rfc']+'</small></td>';
+                  tabla += '<td><small>'+resultado['detail'][i]['commission']+'</small></td>';
+                  tabla += '<td><small>'+resultado['detail'][i]['statusClient']+'</small></td>';
+                  tabla += '<td><small>'+resultado['detail'][i]['primssAgreed']+'</small></td>';
+                  tabla += '<td><small>'+resultado['detail'][i]['dateConstitution']+'</small></td>';
+                  tabla += '<td><small>'+resultado['detail'][i]['datePower']+'</small></td>';
+                  tabla += '</tr>';
+                }
+            tabla +='</tbody></table>';
+            $('#boton').html('<button type="submit" class="btn btn-success" onclick="guardar()"><i class="fa fa-floppy-o"></i> Guardar</button>');
+            $('#tabla').html(tabla);
+            $("#myTable").table("refresh");
+            // $('#myTable').DataTable({
+            //   "searching":false,
+            //   "ordering":true,
+            //   "scrollY":true,
+            //   "scrollX":true,
+            //   "info":true,
+            //   "language": {
+            //       "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Spanish.json"
+            //   }
+            // });
+        }, 
+        error: function(resultado){ 
+          $('#boton').empty();
+          $('#tabla').empty();
+          $('#mensaje').html('El excel no cumple con una estructura valida o tiene errores');
+          $('#btnEnviar').html('<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>');
+          $('#myModal').modal('show');
+        } 
+      }); 
+    } 
+    reader.readAsBinaryString(filexlsx); 
+    }); 
+    function guardar(){
+      $.ajax({ 
+        url:'/client/save/', 
+        type: 'POST', 
+        dataType: 'json', 
+        data: {xls: JSON.stringify(tablaCliente)},  
+        success: function(resultado){ 
+          $('#mensaje').html('Se han Guardado los datos Correctamente');
+          $('#btnEnviar').html('<button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="listar()">Cerrar</button>');
+          $('#myModal').modal('show');
+        }, 
+        error: function(resultado){ 
+          $('#mensaje').html('Ocurrio un problema al guardar');
+          $('#btnEnviar').html('<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>');
+          $('#myModal').modal('show');
+          } 
+        });
+    }
+    function listar(){
+      window.location.href = "/client/list/";
+    }
+  </script>
+{% endblock javascript %}

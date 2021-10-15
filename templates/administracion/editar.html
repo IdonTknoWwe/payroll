@@ -1,0 +1,90 @@
+{% extends "templates/base/base.html" %}
+
+{% block titulo %}
+	Modificacion de Esquema de Pago
+{% endblock titulo %}
+
+{% block content %}
+	{% load widget_tweaks %}
+	<div class="row">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-body">
+          <form method="POST" action="">
+          	{% csrf_token %}
+            <div class="form-body">
+                <h3 class="card-title">Modificacion de Esquema de Pago</h3>
+                <hr>
+                <div class="row p-t-20">
+	                <div class="col-md-6">
+			              <div class="form-group">
+	                    <label class="control-label">Porcentaje Nomina</label>
+	                    {% render_field form.playSheet type="number" class+="form-control" %}
+			              </div>
+			            </div>
+			            <div class="col-md-6">
+			              <div class="form-group">
+	                    <label class="control-label">Monto Efectivo</label>
+	                    {% render_field form.cash type="number" class+="form-control" %}
+			              </div>
+			            </div>
+			            <div class="col-md-6">
+			              <div class="form-group">
+	                    <label class="control-label">Monto Asimilados</label>
+	                    {% render_field form.assimilated type="number" class+="form-control" %}
+			              </div>
+			            </div>
+			            <div class="col-md-6">
+			              <div class="form-group">
+	                    <label class="control-label">Monto Terceros</label>
+	                    {% render_field form.thirds type="number" class+="form-control" %}
+			              </div>
+			            </div>
+			            <div class="col-md-6">
+			              <div class="form-group">
+	                    <label class="control-label">Monto Vales de Despensa</label>
+	                    {% render_field form.pantryVouchers type="number" class+="form-control" %}
+			              </div>
+			            </div>
+			            <div class="col-md-6">
+			              <div class="form-group">
+	                    <label class="control-label">Monto Familiares</label>
+	                    {% render_field form.family type="number" class+="form-control" %}
+			              </div>
+			            </div>
+			            <div class="col-md-6">
+			              <div class="form-group">
+	                    <label class="control-label">Tolerancia Efectivo</label>
+	                    {% render_field form.quantity type="number" class+="form-control" %}
+			              </div>
+			            </div>
+			            <div class="col-md-6">
+			              <div class="form-group">
+	                    <label class="control-label">Tolerancia Porcentaje</label>
+	                    {% render_field form.percent type="number" class+="form-control" %}
+			              </div>
+			            </div>
+			            <div class="col-md-6">
+			              <div class="form-group">
+	                    <label class="control-label">Calcular Por</label>
+	                    {% render_field form.action type="text" class+="form-control" %}
+			              </div>
+			            </div>
+			            <div class="col-md-6">
+			              <div class="form-group">
+	                    <label class="control-label">Identificador</label>
+	                    {% render_field form.identifier type="text" class+="form-control" %}
+			              </div>
+			            </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success"><i class="fa fa-floppy-o"></i> Guardar</button>
+                <a href="{% url 'Dashboard' %}" class="btn btn-danger"><i class="fa fa-window-close"></i> Cancelar</a>
+            </div>
+          </form>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock content %}

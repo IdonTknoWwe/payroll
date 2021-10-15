@@ -1,0 +1,380 @@
+{% extends "templates/base/base.html" %}
+
+{% block titulo %}
+  Crear Nomina
+{% endblock titulo %}
+
+{% block content %}
+  {% load widget_tweaks %}
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+            <form action="" method="POST" enctype="multipart/form-data" id="js-upload-form">
+              {% csrf_token %}
+              <div class="form-body">
+                <h3 class="card-title">Crear Nomina</h3>
+                <hr>
+                <div class="row p-t-20">
+                  <div class="col-md-4">
+                    <label>Archivo</label>
+                    <div class="form-group">
+                      {% render_field form.archivo type="file" class+="form-control" accept=".xls, .xlsx" %} 
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <label>Tipo Nomina</label>
+                    <div class="form-group">
+                     <select class="custom-select col-4" id="select" required="" style="height: 45px;">
+                       <option value="">Seleccionar Nomina</option>
+                        {% for d in diasNomina %}
+                          <option value="{{d}}">{{d}}</option>
+                        {% endfor %}
+                     </select>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <label>Inicio Nomina</label>
+                    <div class="form-group">
+                      {% render_field form.startPayroll type="date" class+="form-control" %}
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <label>Final Nomina</label>
+                    <div class="form-group">
+                      {% render_field form.endPayroll type="date" class+="form-control" %}
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <label>Fecha Pago</label>
+                    <div class="form-group">
+                      {% render_field form.datePayroll type="date" class+="form-control" %}
+                    </div>
+                  </div>
+
+                  <div class="col-md-2">
+                    <label></label>
+                    <div class="form-group">
+                      <button type="submit" style="height: 45px;" class="btn btn-success"><i class="fa fa-spinner"></i> Cargar</button>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                  <label></label>
+                    <div class="form-group" id="boton">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+            <div class="row" >
+              <div class="col-12" id="tabla">
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">ALERTA</h5>
+        </div>
+        <div class="modal-body">
+          <p><small><h3 id="mensaje"></h3></small></p>
+        </div>
+        <div class="modal-footer" id="btnEnviar">
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block tabla %}
+{% endblock tabla %}
+
+{% block javascript %}
+  <script>
+    var formulario;
+    function getCookie(name) { 
+      var cookieValue = null; 
+      if (document.cookie && document.cookie !== '') { 
+          var cookies = document.cookie.split(';'); 
+          for (var i = 0; i < cookies.length; i++) { 
+              var cookie = jQuery.trim(cookies[i]); 
+              if (cookie.substring(0, name.length + 1) === (name + '=')) { 
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1)); 
+                  break; 
+              } 
+          } 
+      } 
+      return cookieValue; 
+    }
+    var csrftoken = getCookie('csrftoken'); 
+    function csrfSafeMethod(method) { 
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method)); 
+    } 
+    $.ajaxSetup({ 
+      beforeSend: function(xhr, settings){ 
+        if(!csrfSafeMethod(settings.type) && !this.crossDomain){ 
+          xhr.setRequestHeader("X-CSRFToken", csrftoken); 
+        } 
+      } 
+    });
+    var tabla_nomina = null;
+    document.getElementById('js-upload-form').addEventListener('submit', function(e) { 
+      e.preventDefault(); 
+      var filexlsx = document.getElementById('id_archivo').files[0]; 
+      var reader = new FileReader(); 
+      reader.onload = function(e){ 
+        var data = e.target.result; 
+        var workbook = XLSX.read(data, {type: 'binary'}); 
+        var result = {}; 
+        workbook.SheetNames.forEach(function(sheetName){ 
+          var roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]); 
+          if(roa.length > 0){ 
+            result[sheetName] = roa; 
+          } 
+        });
+        var inicial = $("#id_startPayroll").val();
+        var final = $("#id_endPayroll").val();
+        var pago = $("#id_datePayroll").val();
+        var cliente = "{{rfc}}";
+        var status = 0;
+        var datos = JSON.stringify(result);
+        var data = new FormData();
+        $.each($('#id_archivo')[0].files, function(i, file) {
+            data.append('archivo', file);
+            data.append('status', status);
+            data.append('startPayroll', inicial);
+            data.append('endPayroll', final);
+            data.append('datePayroll', pago);
+            data.append('cliente', cliente)
+
+
+        });
+        formulario = data;
+        data.append('xls', datos);
+        var select = $("#select").val();
+        data.append('select', select);
+
+        $.ajax({ 
+          url: location.pathname, 
+          type: 'POST', 
+          data: data, 
+          cache: false,
+          contentType: false,
+          processData: false, 
+          success: function(resultado){
+            if (resultado['error'] == -1){
+              limpiar();
+              $('#mensaje').html('El excel no cumple con una estructura valida');
+              $('#btnEnviar').html('<button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>');
+              $('#myModal').modal('show');
+            }else if(resultado['error'] == -2){
+              limpiar();
+              $('#mensaje').html('Datos incorrectos en el excel');
+              $('#btnEnviar').html('<button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>');
+              $('#myModal').modal('show');
+            }else if(resultado['error'] == -3){
+              limpiar();
+              $('#mensaje').html('Faltan empleados en el excel o estan repetidos algunos rfc');
+              $('#btnEnviar').html('<button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>');
+              $('#myModal').modal('show');
+            }else if(resultado['error'] == -4){
+              limpiar();
+              $('#mensaje').html('Verifica el Nombre y Apellidos de los empleados');
+              $('#btnEnviar').html('<button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>');
+              $('#myModal').modal('show');
+            }else{
+            tabla_nomina = resultado['detail']; 
+            tabla = '\
+            <table id="myTable" class="table color-bordered-table info-bordered-table tablesaw table-bordered table-hover table info-bordered-table" data-tablesaw-mode="swipe"><thead><th scope="col" data-tablesaw-sortable-col data-tablesaw-priority="persist"><small>Rfc</small></th><th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Apellido Paterno</small></th><th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Apellido Materno</small></th><th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Nombre(s)</small></th><th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Sueldo Mensual</small></th><th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Calculo</small></th><th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Sueldo Imss</small></th>';
+            if (resultado['contadores'][0]['faltas']>0){ 
+              tabla +='<th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Faltas</small></th>';
+            }
+            if (resultado['contadores'][0]['isr']>0){ 
+              tabla +='<th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Isr</small></th>';
+            }
+            if (resultado['contadores'][0]['imss']>0){ 
+              tabla +='<th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Imss</small></th>';
+            }
+            if (resultado['contadores'][0]['descuento']>0){ 
+              tabla +='<th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Descuento</small></th>';
+            }
+            if (resultado['contadores'][0]['infonavit']>0){ 
+              tabla +='<th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Infonavit</small></th>';
+            }
+            if (resultado['contadores'][0]['fonacot']>0){ 
+              tabla +='<th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Fonacot</small></th>';
+            }
+            if (resultado['contadores'][0]['pension']>0){ 
+              tabla +='<th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Pension Alimenticia</small></th>';
+            }
+            if (resultado['contadores'][0]['otros']>0){ 
+              tabla +='<th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Otros</small></th>';
+            }
+            if (resultado['contadores'][0]['caja']>0){ 
+              tabla +='<th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Caja de Ahorro</small></th>';
+            }
+            if (resultado['contadores'][0]['gastos']>0){ 
+              tabla +='<th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Gastos Medicos</small></th>';
+            }
+            if (resultado['contadores'][0]['prestamos']>0){ 
+              tabla +='<th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Prestamos</small></th>';
+            }
+            tabla +='<th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Nomina Pagar</small></th>';
+            if (resultado['contadores'][0]['gratificacion']>0){ 
+              tabla +='<th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Gratificacion</small></th>';
+            }
+            tabla +='<th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Comision Estatal</small></th>';
+            tabla +='<th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Carga Social</small></th>';
+            if (resultado['contadores'][0]['bolsa']>0){ 
+              tabla +='<th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Bolsa Repartir</small></th>';
+            }
+            if (resultado['contadores'][0]['efectivo']>0){ 
+              tabla +='<th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Efectivo Pagar</small></th>';
+            }
+            if (resultado['contadores'][0]['asimilados']>0){ 
+              tabla +='<th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Asimilado Pagar</small></th>';
+            }
+            if (resultado['contadores'][0]['terceros']>0){ 
+              tabla +=' <th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col   data-tablesaw-priority="3"><small>Terceros Pagar</small></th>';
+            }
+            if (resultado['contadores'][0]['vales']>0){ 
+              tabla +=' <th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Vales Pagar</small></th>';
+            }
+            if (resultado['contadores'][0]['familiares']>0){ 
+              tabla +=' <th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Familiares Pagar</small></th>';
+            }
+            if (resultado['contadores'][0]['sobrante']>0){ 
+              tabla +=' <th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Sobrante</small></th>';
+            }
+            tabla +='<th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="3"><small>Neto Recibido</small></th></tr></thead><tbody>';
+
+              for (var i = 0; i < resultado['detail'].length; i++) {
+                tabla +='<tr>';
+                tabla +='<td><small>'+resultado['detail'][i]['rfc']+'</small></td>';
+                tabla +='<td><small>'+resultado['detail'][i]['apPaterno']+'</small></td>';
+                tabla +='<td><small>'+resultado['detail'][i]['apMaterno']+'</small></td>';
+                tabla +='<td><small>'+resultado['detail'][i]['name']+'</small></td>';
+                tabla +='<td><small>'+resultado['detail'][i]['monthlySalary']+'</small></td>';
+                tabla +='<td><small>'+resultado['detail'][i]['calculation']+'</small></td>';
+                tabla +='<td><small>'+resultado['detail'][i]['salaryImss']+'</small></td>';
+                
+                if (resultado['contadores'][0]['faltas']>0){
+                  tabla +='<td><small>'+resultado['detail'][i]['faults']+'</small></td>';
+                } 
+                if (resultado['contadores'][0]['isr']>0){
+                  tabla +='<td><small>'+resultado['detail'][i]['isr']+'</small></td>';
+                } 
+                if (resultado['contadores'][0]['imss']>0){
+                  tabla +='<td><small>'+resultado['detail'][i]['imss']+'</small></td>';
+                } 
+                if (resultado['contadores'][0]['descuento']>0){
+                  tabla +='<td><small>'+resultado['detail'][i]['discounts']+'</small></td>';
+                } 
+                if (resultado['contadores'][0]['infonavit']>0){
+                  tabla +='<td><small>'+resultado['detail'][i]['creditInfonavit']+'</small></td>';
+                } 
+                if (resultado['contadores'][0]['fonacot']>0){
+                  tabla +='<td><small>'+resultado['detail'][i]['creditFonacot']+'</small></td>';
+                } 
+                if (resultado['contadores'][0]['pension']>0){
+                  tabla +='<td><small>'+resultado['detail'][i]['alimony']+'</small></td>';
+                }  
+                if (resultado['contadores'][0]['otros']>0){
+                  tabla +='<td><small>'+resultado['detail'][i]['others']+'</small></td>';
+                } 
+                if (resultado['contadores'][0]['caja']>0){
+                  tabla +='<td><small>'+resultado['detail'][i]['savingsAccount']+'</small></td>';
+                } 
+                if (resultado['contadores'][0]['gastos']>0){
+                  tabla +='<td><small>'+resultado['detail'][i]['medicalExpenses']+'</small></td>';
+                } 
+                if (resultado['contadores'][0]['prestamos']>0){
+                  tabla +='<td><small>'+resultado['detail'][i]['loans']+'</small></td>';
+                } 
+                tabla +='<td><small>'+resultado['detail'][i]['paySalary']+'</small></td>';
+                if (resultado['contadores'][0]['gratificacion']>0){
+                  tabla +='<td><small>'+resultado['detail'][i]['gratification']+'</small></td>';
+                }
+                tabla +='<td><small>'+resultado['detail'][i]['stateTax']+'</small></td>';
+                tabla +='<td><small>'+resultado['detail'][i]['socialBurden']+'</small></td>';
+                if (resultado['contadores'][0]['bolsa']>0){
+                  tabla +='<td><small>'+resultado['detail'][i]['bagToDeal']+'</small></td>';
+                }
+                if (resultado['contadores'][0]['efectivo']>0){
+                  tabla +='<td><small>'+resultado['detail'][i]['cash']+'</small></td>';
+                }
+                if (resultado['contadores'][0]['asimilados']>0){
+                  tabla +='<td><small>'+resultado['detail'][i]['assimilated']+'</small></td>';
+                }
+                if (resultado['contadores'][0]['terceros']>0){
+                  tabla +='<td><small>'+resultado['detail'][i]['thirdParties']+'</small></td>';
+                }
+                if (resultado['contadores'][0]['vales']>0){
+                  tabla +='<td><small>'+resultado['detail'][i]['pantryVouchers']+'</small></td>';
+                }
+                if (resultado['contadores'][0]['familiares']>0){
+                  tabla +='<td><small>'+resultado['detail'][i]['family']+'</small></td>';
+                }
+                if (resultado['contadores'][0]['sobrante']>0){
+                  tabla +='<td><small>'+resultado['detail'][i]['surplus']+'</small></td>';
+                }
+                tabla +='<td><small>'+resultado['detail'][i]['netReceived']+'</small></td>';
+                tabla +='</tr>';
+              }
+            tabla += '</tbody></table>';
+            $('#boton').html('<button type="submit" style="height: 45px;" class="btn btn-success" onclick="guardar()"><i class="fa fa-floppy-o"></i> Guardar</button>');
+            $('#tabla').html(tabla);
+            $("#myTable").table("refresh");
+          }
+          }, 
+          error: function(resultado){
+            limpiar();
+            $('#mensaje').html('Ocurrio un problema intentalo mas tarde');
+            $('#btnEnviar').html('<button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>');
+            $('#myModal').modal('show');
+          } 
+        }); 
+      } 
+      reader.readAsBinaryString(filexlsx); 
+    });
+    
+    function guardar(){
+      formulario.set('xls', JSON.stringify(tabla_nomina));
+      $.ajax({
+         url: "{% url 'Clientes:guardaNominaEmpleado' pk=id %}",
+         type: 'POST',
+         data: formulario, 
+         cache: false,
+         contentType: false,
+         processData: false,
+         success: function(data){
+           $('#mensaje').empty();
+           $('#btnEnviar').empty();
+           $('#mensaje').html('DATOS GUARDADOS CORRECTAMENTE');
+           $('#btnEnviar').html('<button type="button" class="btn btn-primary" data-dismiss="modal" onclick=listar()>Cerrar</button>');
+           $('#myModal').modal('show');
+         },
+         error: function(resultado){
+         $('#mensaje').empty();
+         $('#btnEnviar').empty();
+         $('#mensaje').html('NO SE PUDIERON GUARDAR LOS DATOS');
+         $('#btnEnviar').html('<button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>');
+         $('#myModal').modal('show');
+       }
+     });
+    }
+    function listar(){
+      window.location.href = "{% url 'Clientes:statusNomina' pk=id %}";
+    }
+
+    function limpiar(){
+      $('#tabla').empty();
+      $('#mensaje').empty();
+      $('#btnEnviar').empty();
+    }
+  </script>
+{% endblock javascript %}
